@@ -1,134 +1,103 @@
 package com.gestao.ui;
 
-import com.gestao.dao.UsuarioDAO;
 import com.gestao.model.Usuario;
-import com.gestao.ui.components.CustomButton;
-import com.gestao.ui.components.CustomPanel;
-import com.gestao.ui.components.CustomTextField;
-import com.gestao.ui.themes.ModernTheme;
+import com.gestao.service.UsuarioService;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.sql.SQLException;
 
 public class LoginForm extends JFrame {
 
-    private CustomTextField loginField;
-    private JPasswordField senhaField;
-    private UsuarioDAO usuarioDAO;
+    private final JTextField txtLogin = new JTextField(20);
+    private final JPasswordField txtSenha = new JPasswordField(20);
 
     public LoginForm() {
-        usuarioDAO = new UsuarioDAO();
-        initUI();
-    }
-
-    private void initUI() {
-        setTitle("Login");
-        setSize(400, 500);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+    setTitle("Sistema de Gestão - Login");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
-        getContentPane().setBackground(ModernTheme.BACKGROUND);
-        setLayout(new GridBagLayout());
 
-        CustomPanel mainPanel = new CustomPanel();
-        mainPanel.setLayout(new GridBagLayout());
-        mainPanel.setPreferredSize(new Dimension(320, 380));
+    JPanel root = new JPanel(new GridBagLayout());
+    root.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 16, 8, 16);
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(6, 6, 6, 6);
+        gc.anchor = GridBagConstraints.WEST;
 
-        JLabel titleLabel = new JLabel("Bem-vindo");
-        titleLabel.setFont(ModernTheme.FONT_TITLE);
-        titleLabel.setForeground(ModernTheme.TEXT_PRIMARY);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(20, 16, 20, 16);
-        mainPanel.add(titleLabel, gbc);
+        Dimension fieldSize = new Dimension(220, 28);
+        txtLogin.setPreferredSize(fieldSize);
+        txtSenha.setPreferredSize(fieldSize);
 
-        gbc.insets = new Insets(8, 16, 8, 16);
+        gc.gridx = 0; gc.gridy = 0; root.add(new JLabel("Login:"), gc);
+        gc.gridx = 1; gc.gridy = 0; gc.fill = GridBagConstraints.HORIZONTAL; root.add(txtLogin, gc);
+        gc.gridx = 0; gc.gridy = 1; gc.fill = GridBagConstraints.NONE; root.add(new JLabel("Senha:"), gc);
+        gc.gridx = 1; gc.gridy = 1; gc.fill = GridBagConstraints.HORIZONTAL; root.add(txtSenha, gc);
 
-        loginField = new CustomTextField();
-        loginField.setPlaceholder("Login");
-        gbc.gridy = 1;
-        mainPanel.add(loginField, gbc);
+    JButton btnEntrar = new JButton("Entrar");
+        btnEntrar.addActionListener(e -> fazerLogin());
+    // Enter ativa o botão Entrar
+    getRootPane().setDefaultButton(btnEntrar);
 
-        senhaField = new JPasswordField();
-        senhaField.setToolTipText("Senha");
-        senhaField.setFont(ModernTheme.FONT_BODY);
-        senhaField.setBackground(ModernTheme.BACKGROUND);
-        senhaField.setForeground(ModernTheme.TEXT_PRIMARY);
-        senhaField.setCaretColor(ModernTheme.TEXT_PRIMARY);
-        senhaField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ModernTheme.BORDER, 1, true),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
-        gbc.gridy = 2;
-        mainPanel.add(senhaField, gbc);
+        JButton btnCadastrar = new JButton("Cadastrar");
+        btnCadastrar.setBorderPainted(false);
+        btnCadastrar.setContentAreaFilled(false);
+        btnCadastrar.setFocusPainted(false);
+        btnCadastrar.setForeground(UIManager.getColor("Component.linkColor"));
+        btnCadastrar.addActionListener(e -> abrirCadastroUsuario());
 
-        CustomButton loginButton = new CustomButton("Entrar");
-        gbc.gridy = 3;
-        gbc.insets = new Insets(16, 16, 8, 16);
-        mainPanel.add(loginButton, gbc);
+        JButton btnRecuperar = new JButton("Esqueci minha senha");
+        btnRecuperar.setBorderPainted(false);
+        btnRecuperar.setContentAreaFilled(false);
+        btnRecuperar.setFocusPainted(false);
+        btnRecuperar.setForeground(UIManager.getColor("Component.linkColor"));
+        btnRecuperar.addActionListener(e -> abrirRecuperacaoSenha());
 
-        JPanel linksPanel = new JPanel(new BorderLayout());
-        linksPanel.setOpaque(false);
+        JPanel leftActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        leftActions.add(btnCadastrar);
+        leftActions.add(btnRecuperar);
+        leftActions.setOpaque(false);
 
-        JLabel forgotPasswordLabel = createLinkLabel("Esqueci minha senha");
-        JLabel signUpLabel = createLinkLabel("Cadastrar-se");
+        JPanel rightActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        rightActions.add(btnEntrar);
+        rightActions.setOpaque(false);
 
-        linksPanel.add(forgotPasswordLabel, BorderLayout.WEST);
-        linksPanel.add(signUpLabel, BorderLayout.EAST);
-        gbc.gridy = 4;
-        gbc.insets = new Insets(4, 16, 16, 16);
-        mainPanel.add(linksPanel, gbc);
+        JPanel actions = new JPanel(new BorderLayout());
+        actions.add(leftActions, BorderLayout.WEST);
+        actions.add(rightActions, BorderLayout.EAST);
 
-        add(mainPanel, new GridBagConstraints());
+        gc.gridx = 0; gc.gridy = 2; gc.gridwidth = 2; gc.fill = GridBagConstraints.HORIZONTAL;
+        root.add(actions, gc);
 
-        loginButton.addActionListener(e -> autenticar());
-
-        signUpLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                new CadastroUsuarioForm().setVisible(true);
-                dispose();
-            }
-        });
+        setContentPane(root);
+        pack();
+        // largura convencional
+        setSize(420, Math.max(getHeight(), 220));
+        setLocationRelativeTo(null);
     }
 
-    private JLabel createLinkLabel(String text) {
-        JLabel label = new JLabel(text);
-        label.setForeground(ModernTheme.ACCENT_BLUE);
-        label.setFont(ModernTheme.FONT_BODY.deriveFont(12f));
-        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return label;
+    private void fazerLogin() {
+        String login = txtLogin.getText();
+        String senha = new String(txtSenha.getPassword());
+
+        Usuario usuario = new UsuarioService().validarLogin(login, senha);
+        if (usuario != null) {
+            com.gestao.service.DebugLogger.info("Login bem-sucedido: " + login + " (" + usuario.getCargo() + ")");
+            dispose();
+            new MainDashboard(usuario).setVisible(true);
+        } else {
+            com.gestao.service.DebugLogger.info("Falha no login para usuário: " + login);
+            JOptionPane.showMessageDialog(this, "Login ou senha inválidos");
+        }
     }
 
-    private void autenticar() {
-        String login = loginField.getText();
-        String senha = new String(senhaField.getPassword());
+    private void abrirCadastroUsuario() {
+        CadastroUsuarioForm form = new CadastroUsuarioForm();
+        form.setLocationRelativeTo(this);
+        form.setVisible(true);
+    }
 
-        if (login.isEmpty() || senha.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Login e Senha são obrigatórios.", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            Usuario usuario = usuarioDAO.validarLogin(login, senha);
-            if (usuario != null) {
-                new MainApplicationUI(usuario).setVisible(true);
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Login ou senha inválidos.", "Erro de Autenticação", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao conectar ao banco de dados.\nVerifique sua conexão e as configurações.", "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
+    private void abrirRecuperacaoSenha() {
+        RecuperacaoSenhaForm form = new RecuperacaoSenhaForm();
+        form.setLocationRelativeTo(this);
+        form.setVisible(true);
     }
 }

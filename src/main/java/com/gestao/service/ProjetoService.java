@@ -1,20 +1,28 @@
 package com.gestao.service;
 
-import com.gestao.dao.ProjetoDAO;
 import com.gestao.model.Projeto;
+import com.gestao.repository.ProjetoRepositorio;
+import java.util.List;
 
 public class ProjetoService {
-    private ProjetoDAO projetoDAO = new ProjetoDAO();
+    private ProjetoRepositorio projetoRepositorio = new ProjetoRepositorio();
 
-    // Lógica para criar um projeto
     public boolean criarProjeto(Projeto projeto) {
         if (projeto.getNome() == null || projeto.getNome().isEmpty()) {
             return false;
         }
-        // Aqui poderia haver mais validações de regras de negócio
-        return projetoDAO.adicionar(projeto);
+        projetoRepositorio.adicionar(projeto);
+        com.gestao.service.DebugLogger.info("Projeto criado: " + projeto.getNome());
+        return true;
     }
 
-    // Outros métodos de negócio
-    // ...
+    public List<Projeto> listarProjetos() {
+        return projetoRepositorio.listar();
+    }
+
+    public void adicionarTarefaAoProjeto(Projeto projeto, com.gestao.model.Tarefa tarefa) {
+        if (projeto == null || tarefa == null) return;
+        projeto.getTarefas().add(tarefa);
+        projetoRepositorio.adicionar(projeto); // regrava projeto atualizado
+    }
 }

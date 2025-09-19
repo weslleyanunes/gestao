@@ -1,0 +1,16 @@
+Third-Party Notices
+===================
+
+Este produto inclui componentes de terceiros, conforme listado abaixo. As respectivas licenças estão disponíveis nas referências indicadas e/ou incluídas neste artefato.
+
+1) FlatLaf (com.formdev:flatlaf)
+   - Versão: 3.2.5
+   - Finalidade: Look and Feel para Swing (temas claro/escuro)
+   - Licença: Apache License 2.0
+   - Texto/Referência: consultar META-INF/licenses/flatlaf-APACHE-2.0.txt ou https://www.apache.org/licenses/LICENSE-2.0
+
+2) jBCrypt (org.mindrot:jbcrypt)
+   - Versão: 0.4
+   - Finalidade: Hashing de senha (BCrypt)
+   - Licença: ISC
+   - Texto/Referência: consultar META-INF/licenses/jbcrypt-ISC.txt ou https://opensource.org/license/isc-license-txt

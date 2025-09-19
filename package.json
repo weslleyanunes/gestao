@@ -1,0 +1,17 @@
+{
+  "name": "gestao",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Ferramentas de repositório: conventional commits, commitlint, husky e gerador de changelog.",
+  "scripts": {
+    "prepare": "husky install",
+    "release": "standard-version",
+    "changelog": "standard-version --skip.bump --skip.tag --prerelease rc"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "husky": "^9.1.6",
+    "standard-version": "^9.5.0"
+  }
+}

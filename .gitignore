@@ -36,3 +36,12 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Logs ###
+*.log
+
+### Windows ###
+Thumbs.db
+
+### Local database/runtime data ###
+/database/data.ser

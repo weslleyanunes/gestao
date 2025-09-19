@@ -1,156 +1,101 @@
 package com.gestao.ui;
 
-import com.gestao.dao.UsuarioDAO;
 import com.gestao.model.Usuario;
-import com.gestao.ui.components.CustomButton;
-import com.gestao.ui.components.CustomPanel;
-import com.gestao.ui.components.CustomTextField;
-import com.gestao.ui.themes.ModernTheme;
-
+import com.gestao.service.UsuarioService;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.sql.SQLException;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
 
 public class CadastroUsuarioForm extends JFrame {
-
-    private CustomTextField nomeField, cpfField, cargoField, loginField;
+    // Campos do formulário
+    private JTextField nomeField;
+    private JTextField cpfField;
+    private JTextField loginField;
     private JPasswordField senhaField;
-    private JComboBox<String> perfilComboBox;
-    private UsuarioDAO usuarioDAO;
+    private JComboBox<String> cargoComboBox;
+    private JButton cadastrarButton;
+    private JButton cancelarButton;
 
     public CadastroUsuarioForm() {
-        usuarioDAO = new UsuarioDAO();
-        initUI();
-    }
-
-    private void initUI() {
-        setTitle("Cadastro de Usuário");
-        setSize(400, 600);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+    setTitle("Sistema de Gestão - Cadastro de Usuário");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setResizable(false);
-        getContentPane().setBackground(ModernTheme.BACKGROUND);
-        setLayout(new GridBagLayout());
 
-        CustomPanel mainPanel = new CustomPanel();
-        mainPanel.setLayout(new GridBagLayout());
-        mainPanel.setPreferredSize(new Dimension(320, 520));
+    JPanel panel = new JPanel(new GridBagLayout());
+    panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+    GridBagConstraints gc = new GridBagConstraints();
+    gc.insets = new Insets(6, 6, 6, 6);
+    gc.anchor = GridBagConstraints.WEST;
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 16, 8, 16);
-        gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+    Dimension fieldSize = new Dimension(220, 28);
+    nomeField = new JTextField(); nomeField.setPreferredSize(fieldSize);
+    cpfField = new JTextField(); cpfField.setPreferredSize(fieldSize);
+    loginField = new JTextField(); loginField.setPreferredSize(fieldSize);
+    senhaField = new JPasswordField(); senhaField.setPreferredSize(fieldSize);
+    String[] cargos = {"Administrador", "Gerente", "Membro", "Desenvolvedor"};
+    cargoComboBox = new JComboBox<>(cargos);
+    cargoComboBox.setPreferredSize(fieldSize);
 
-        JLabel titleLabel = new JLabel("Criar Conta");
-        titleLabel.setFont(ModernTheme.FONT_TITLE);
-        titleLabel.setForeground(ModernTheme.TEXT_PRIMARY);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(20, 16, 20, 16);
-        mainPanel.add(titleLabel, gbc);
+    int y = 0;
+    gc.gridx = 0; gc.gridy = y; panel.add(new JLabel("Nome:"), gc);
+    gc.gridx = 1; gc.gridy = y++; gc.fill = GridBagConstraints.HORIZONTAL; panel.add(nomeField, gc);
 
-        gbc.gridwidth = 2; // Corrigido para 2
-        gbc.insets = new Insets(8, 16, 8, 16);
+    gc.gridx = 0; gc.gridy = y; gc.fill = GridBagConstraints.NONE; panel.add(new JLabel("CPF:"), gc);
+    gc.gridx = 1; gc.gridy = y++; gc.fill = GridBagConstraints.HORIZONTAL; panel.add(cpfField, gc);
 
-        nomeField = new CustomTextField();
-        nomeField.setPlaceholder("Nome Completo");
-        gbc.gridy = 1;
-        mainPanel.add(nomeField, gbc);
+    // Removido campo de texto de cargo; usar apenas combo abaixo
 
-        cpfField = new CustomTextField();
-        cpfField.setPlaceholder("CPF");
-        gbc.gridy = 2;
-        mainPanel.add(cpfField, gbc);
+    gc.gridx = 0; gc.gridy = y; gc.fill = GridBagConstraints.NONE; panel.add(new JLabel("Login:"), gc);
+    gc.gridx = 1; gc.gridy = y++; gc.fill = GridBagConstraints.HORIZONTAL; panel.add(loginField, gc);
 
-        cargoField = new CustomTextField();
-        cargoField.setPlaceholder("Cargo");
-        gbc.gridy = 3;
-        mainPanel.add(cargoField, gbc);
+    gc.gridx = 0; gc.gridy = y; gc.fill = GridBagConstraints.NONE; panel.add(new JLabel("Senha:"), gc);
+    gc.gridx = 1; gc.gridy = y++; gc.fill = GridBagConstraints.HORIZONTAL; panel.add(senhaField, gc);
 
-        loginField = new CustomTextField();
-        loginField.setPlaceholder("Login");
-        gbc.gridy = 4;
-        mainPanel.add(loginField, gbc);
+    gc.gridx = 0; gc.gridy = y; gc.fill = GridBagConstraints.NONE; panel.add(new JLabel("Cargo:"), gc);
+    gc.gridx = 1; gc.gridy = y++; gc.fill = GridBagConstraints.HORIZONTAL; panel.add(cargoComboBox, gc);
 
-        senhaField = new JPasswordField();
-        senhaField.setToolTipText("Senha");
-        senhaField.setFont(ModernTheme.FONT_BODY);
-        senhaField.setBackground(ModernTheme.BACKGROUND);
-        senhaField.setForeground(ModernTheme.TEXT_PRIMARY);
-        senhaField.setCaretColor(ModernTheme.TEXT_PRIMARY);
-        senhaField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ModernTheme.BORDER, 1, true),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
-        gbc.gridy = 5;
-        mainPanel.add(senhaField, gbc);
+    JPanel botoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    cadastrarButton = new JButton("Cadastrar");
+    cadastrarButton.addActionListener(this::cadastrarUsuario);
+    cancelarButton = new JButton("Cancelar");
+    cancelarButton.addActionListener(e -> dispose());
+    botoes.add(cancelarButton);
+    botoes.add(cadastrarButton);
 
-        perfilComboBox = new JComboBox<>(new String[]{"Desenvolvedor", "Gerente"});
-        perfilComboBox.setFont(ModernTheme.FONT_BODY);
-        perfilComboBox.setBackground(ModernTheme.BACKGROUND);
-        perfilComboBox.setForeground(ModernTheme.TEXT_PRIMARY);
-        gbc.gridy = 6;
-        mainPanel.add(perfilComboBox, gbc);
+    gc.gridx = 0; gc.gridy = y; gc.gridwidth = 2; gc.fill = GridBagConstraints.HORIZONTAL;
+    panel.add(botoes, gc);
 
-        CustomButton cadastrarButton = new CustomButton("Cadastrar");
-        gbc.gridy = 7;
-        gbc.insets = new Insets(16, 16, 8, 16);
-        mainPanel.add(cadastrarButton, gbc);
-
-        JLabel loginLabel = createLinkLabel("Já tem uma conta? Faça login");
-        gbc.gridy = 8;
-        gbc.insets = new Insets(4, 16, 16, 16);
-        mainPanel.add(loginLabel, gbc);
-
-        add(mainPanel, new GridBagConstraints());
-
-        cadastrarButton.addActionListener(e -> cadastrarUsuario());
-
-        loginLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                new LoginForm().setVisible(true);
-                dispose();
-            }
-        });
+    add(panel);
     }
 
-    private JLabel createLinkLabel(String text) {
-        JLabel label = new JLabel(text);
-        label.setForeground(ModernTheme.ACCENT_BLUE);
-        label.setFont(ModernTheme.FONT_BODY.deriveFont(12f));
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return label;
-    }
-
-    private void cadastrarUsuario() {
-        String nome = nomeField.getText();
-        String cpf = cpfField.getText();
-        String cargo = cargoField.getText();
-        String login = loginField.getText();
-        String senha = new String(senhaField.getPassword());
-        String perfil = (String) perfilComboBox.getSelectedItem();
-
-        if (nome.isEmpty() || login.isEmpty() || senha.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nome, Login e Senha são obrigatórios.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Usuario novoUsuario = new Usuario(0L, nome, cpf, cargo, login, senha, perfil);
-
+    private void cadastrarUsuario(ActionEvent e) {
         try {
-            usuarioDAO.adicionar(novoUsuario);
-            JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-            new LoginForm().setVisible(true);
-            this.dispose();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao cadastrar usuário: " + ex.getMessage(), "Erro de Banco de Dados", JOptionPane.ERROR_MESSAGE);
+            Usuario usuario = new Usuario();
+            usuario.setNome(nomeField.getText());
+            usuario.setCpf(cpfField.getText());
+            // Cargo virá do combo abaixo
+            usuario.setLogin(loginField.getText());
+            usuario.setSenhaHash(String.valueOf(senhaField.getPassword()));
+            usuario.setCargo(cargoComboBox.getSelectedItem().toString());
+
+            UsuarioService usuarioService = new UsuarioService();
+            if (usuarioService.criarUsuario(usuario)) {
+                JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!");
+                limparFormulario();
+            } else {
+                JOptionPane.showMessageDialog(this, "Falha no cadastro: Verifique se o login já existe ou campos obrigatórios estão preenchidos");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao cadastrar usuário: " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    private void limparFormulario() {
+    Arrays.asList(nomeField, cpfField, loginField, senhaField)
+                .forEach(campo -> campo.setText(""));
+    cargoComboBox.setSelectedIndex(0);
     }
 }
