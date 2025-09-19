@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven 3.8.7
+Built-By: wes
+Build-Jdk: 24.0.2
+Main-Class: com.gestao.main.App
+

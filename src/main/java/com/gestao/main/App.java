@@ -21,9 +21,18 @@ public class App {
             } else {
                 UIManager.setLookAndFeel(new FlatLightLaf());
             }
-            UIManager.put("Component.arc", 14);
-            UIManager.put("Button.arc", 14);
+            // Presets de estilo (Material-like) globais via FlatLaf
+            UIManager.put("Component.arc", 16);
+            UIManager.put("Button.arc", 16);
             UIManager.put("TextComponent.arc", 14);
+            UIManager.put("Component.focusWidth", 1);
+            UIManager.put("Button.focusWidth", 1);
+            UIManager.put("TextComponent.minimumWidth", 120);
+            UIManager.put("Button.minimumWidth", 100);
+            UIManager.put("Separator.thickness", 1);
+            UIManager.put("ScrollBar.thumbArc", 999);
+            UIManager.put("ScrollBar.trackArc", 999);
+            UIManager.put("ScrollBar.width", 12);
         } catch (Exception ignored) {}
         criarAdminPadrao();
         SwingUtilities.invokeLater(() -> {

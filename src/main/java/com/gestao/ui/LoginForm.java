@@ -16,14 +16,15 @@ public class LoginForm extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
-    JPanel root = new JPanel(new GridBagLayout());
-    root.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        JPanel root = new JPanel(new GridBagLayout());
+        root.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 
         GridBagConstraints gc = new GridBagConstraints();
         gc.insets = new Insets(6, 6, 6, 6);
         gc.anchor = GridBagConstraints.WEST;
 
-        Dimension fieldSize = new Dimension(220, 28);
+        // Campos em largura convencional (~260px)
+        Dimension fieldSize = new Dimension(260, 30);
         txtLogin.setPreferredSize(fieldSize);
         txtSenha.setPreferredSize(fieldSize);
 
@@ -32,10 +33,10 @@ public class LoginForm extends JFrame {
         gc.gridx = 0; gc.gridy = 1; gc.fill = GridBagConstraints.NONE; root.add(new JLabel("Senha:"), gc);
         gc.gridx = 1; gc.gridy = 1; gc.fill = GridBagConstraints.HORIZONTAL; root.add(txtSenha, gc);
 
-    JButton btnEntrar = new JButton("Entrar");
+        JButton btnEntrar = new JButton("Entrar");
         btnEntrar.addActionListener(e -> fazerLogin());
-    // Enter ativa o botão Entrar
-    getRootPane().setDefaultButton(btnEntrar);
+        // Enter ativa o botão Entrar
+        getRootPane().setDefaultButton(btnEntrar);
 
         JButton btnCadastrar = new JButton("Cadastrar");
         btnCadastrar.setBorderPainted(false);
@@ -51,7 +52,8 @@ public class LoginForm extends JFrame {
         btnRecuperar.setForeground(UIManager.getColor("Component.linkColor"));
         btnRecuperar.addActionListener(e -> abrirRecuperacaoSenha());
 
-        JPanel leftActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+    // Ações em linha: links à esquerda, ação principal à direita
+    JPanel leftActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         leftActions.add(btnCadastrar);
         leftActions.add(btnRecuperar);
         leftActions.setOpaque(false);
@@ -69,8 +71,10 @@ public class LoginForm extends JFrame {
 
         setContentPane(root);
         pack();
-        // largura convencional
-        setSize(420, Math.max(getHeight(), 220));
+        // Janela com largura estável para evitar estouro/clipping
+        int targetWidth = Math.max(getWidth(), 420);
+        int targetHeight = Math.max(getHeight(), 280);
+        setSize(targetWidth, targetHeight);
         setLocationRelativeTo(null);
     }
 

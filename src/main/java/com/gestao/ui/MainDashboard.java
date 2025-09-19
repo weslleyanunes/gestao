@@ -47,7 +47,13 @@ public class MainDashboard extends JFrame {
         JButton btnLog = new JButton("Logs");
         btnUsu.setVisible(usuario.isAdministrador() || usuario.isDesenvolvedor());
         btnLog.setVisible(usuario.isDesenvolvedor());
-        nav.add(btnProj);
+            // Padronizar largura dos botões de navegação
+            Dimension navBtnSize = new Dimension(140, 28);
+            btnProj.setPreferredSize(navBtnSize);
+            btnTar.setPreferredSize(navBtnSize);
+            btnUsu.setPreferredSize(navBtnSize);
+            btnLog.setPreferredSize(navBtnSize);
+            nav.add(btnProj);
         nav.add(Box.createVerticalStrut(6));
         nav.add(btnTar);
         if (btnUsu.isVisible()) {
@@ -58,7 +64,9 @@ public class MainDashboard extends JFrame {
             nav.add(Box.createVerticalStrut(6));
             nav.add(btnLog);
         }
-        add(nav, BorderLayout.WEST);
+    // Ajuste estético de largura fixa para o painel lateral
+        nav.setPreferredSize(new Dimension(160, 0));
+    add(nav, BorderLayout.WEST);
 
         // Área de conteúdo com CardLayout
         cards = new CardLayout();
@@ -67,7 +75,7 @@ public class MainDashboard extends JFrame {
         conteudo.add(tarefasPanel, "tarefas");
         conteudo.add(usuariosPanel, "usuarios");
         conteudo.add(logsPanel, "logs");
-        add(conteudo, BorderLayout.CENTER);
+    add(conteudo, BorderLayout.CENTER);
 
         // Ações de navegação
         btnProj.addActionListener(e -> cards.show(conteudo, "projetos"));
@@ -75,15 +83,21 @@ public class MainDashboard extends JFrame {
         btnUsu.addActionListener(e -> cards.show(conteudo, "usuarios"));
         btnLog.addActionListener(e -> cards.show(conteudo, "logs"));
 
-        // Ícones no canto inferior direito: sair, preferências, tema, logs, sobre
+        // Ícones no canto inferior direito: sair, log de acesso, tema, logs, sobre
     JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     south.setBorder(BorderFactory.createEmptyBorder(8,8,8,8));
         JButton sairIco = new JButton("⎋");
         sairIco.setToolTipText("Sair");
         sairIco.addActionListener(e -> sair());
-    JButton prefIco = new JButton("⚙");
-    prefIco.setToolTipText("Preferências");
-    prefIco.addActionListener(e -> abrirPreferencias());
+    // Novo botão: Log de Acesso (substitui Preferências)
+    JButton acessoLogIco = new JButton("🔒");
+    acessoLogIco.setToolTipText("Log de acesso");
+    acessoLogIco.setVisible(usuario.isAdministrador() || usuario.isDesenvolvedor());
+    acessoLogIco.addActionListener(e -> {
+        AccessLogDialog dlg = new AccessLogDialog(this);
+        dlg.setLocationRelativeTo(this);
+        dlg.setVisible(true);
+    });
         JButton temaIco = new JButton("☼");
         temaIco.setToolTipText("Alternar tema claro/escuro");
         temaIco.addActionListener(e -> alternarTema());
@@ -101,12 +115,20 @@ public class MainDashboard extends JFrame {
             dlg.setLocationRelativeTo(this);
             dlg.setVisible(true);
         });
-        south.add(prefIco);
+    south.add(acessoLogIco);
         south.add(temaIco);
         south.add(logsIco);
         south.add(sobreIco);
         south.add(sairIco);
-        add(south, BorderLayout.SOUTH);
+    add(south, BorderLayout.SOUTH);
+
+        // Log de acesso ao abrir o dashboard
+        try {
+            java.nio.file.Path lp = java.nio.file.Paths.get("database/access.log");
+            java.nio.file.Files.createDirectories(lp.getParent());
+            String line = String.format("%s - LOGIN: %s (%s)%n", java.time.LocalDateTime.now(), usuario.getLogin(), usuario.getCargo());
+            java.nio.file.Files.write(lp, line.getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
+        } catch (Exception ignored) {}
 
         montarPainelProjetos();
         montarPainelTarefas();
@@ -117,15 +139,7 @@ public class MainDashboard extends JFrame {
         else cards.show(conteudo, "tarefas");
     }
 
-    private void abrirPreferencias() {
-        PreferencesDialog dialog = new PreferencesDialog(this, () -> {
-            // Reaplica tema e debug após salvar preferências
-            SwingUtilities.updateComponentTreeUI(this);
-            montarPainelLogs();
-        });
-        dialog.setLocationRelativeTo(this);
-        dialog.setVisible(true);
-    }
+    // Preferências removido conforme solicitado.
 
     private void sair() {
         int op = JOptionPane.showConfirmDialog(this, "Deseja realmente sair?", "Confirmação", JOptionPane.YES_NO_OPTION);
@@ -154,7 +168,7 @@ public class MainDashboard extends JFrame {
     if (projetosPanel == null) return;
         projetosPanel.removeAll();
         ProjetoPanel painel = new ProjetoPanel(usuarioLogado);
-        projetosPanel.add(painel, BorderLayout.CENTER);
+    projetosPanel.add(painel, BorderLayout.CENTER);
         projetosPanel.revalidate();
         projetosPanel.repaint();
     }
@@ -162,7 +176,7 @@ public class MainDashboard extends JFrame {
     private void montarPainelTarefas() {
         tarefasPanel.removeAll();
         TarefaPanel tarefas = new TarefaPanel(usuarioLogado);
-        tarefasPanel.add(new JScrollPane(tarefas), BorderLayout.CENTER);
+    tarefasPanel.add(new JScrollPane(tarefas), BorderLayout.CENTER);
         tarefasPanel.revalidate();
         tarefasPanel.repaint();
     }
@@ -170,7 +184,8 @@ public class MainDashboard extends JFrame {
     private void montarPainelUsuarios() {
         if (usuariosPanel == null) return;
         usuariosPanel.removeAll();
-        usuariosPanel.add(new UsuariosPanel(), BorderLayout.CENTER);
+    UsuariosPanel up = new UsuariosPanel();
+    usuariosPanel.add(up, BorderLayout.CENTER);
         usuariosPanel.revalidate();
         usuariosPanel.repaint();
     }
@@ -195,7 +210,7 @@ public class MainDashboard extends JFrame {
             dlg.setVisible(true);
         });
         top.add(changelog);
-        logsPanel.add(top, BorderLayout.NORTH);
+    logsPanel.add(top, BorderLayout.NORTH);
         logsPanel.add(new JScrollPane(area), BorderLayout.CENTER);
         carregarLogs(area);
         logsPanel.revalidate();
